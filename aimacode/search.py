@@ -28,6 +28,8 @@ class Problem:
         other arguments."""
         self.initial = initial
         self.goal = goal
+        self.node_expanded_count = 0  # To keep track of the # of nodes expanded during search
+        self.goal_test_count = 0
 
     def actions(self, state):
         """Return the actions that can be executed in the given
@@ -47,6 +49,7 @@ class Problem:
         state to self.goal or checks for state in self.goal if it is a
         list, as specified in the constructor. Override this method if
         checking against a single self.goal is not enough."""
+
         if isinstance(self.goal, list):
             return is_in(state, self.goal)
         else:
@@ -96,8 +99,13 @@ class Node:
 
     def expand(self, problem):
         "List the nodes reachable in one step from this node."
-        return [self.child_node(problem, action)
+        #problem.node_expanded_count += len(problem.actions(self.state))
+        #problem.node_expanded_count += 1
+
+        new_nodes = [self.child_node(problem, action)
                 for action in problem.actions(self.state)]
+
+        return new_nodes
 
     def child_node(self, problem, action):
         "[Figure 3.10]"

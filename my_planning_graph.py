@@ -465,7 +465,7 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        # TODO test for Competing Needs between nodes
+        # TOest for Competing Needs between nodes
 
         for precond_pos in node_a1.action.precond_pos:
             if precond_pos in node_a2.action.precond_neg:

@@ -1,8 +1,10 @@
 from aimacode.logic import PropKB
 from aimacode.planning import Action
-from aimacode.search import (
-    Node, Problem,
-)
+from aimacode.search import *
+'''(
+    Node, Problem, 
+)'''
+
 from aimacode.utils import expr
 from lp_utils import (
     FluentState, encode_state, decode_state,
@@ -11,6 +13,7 @@ from my_planning_graph import PlanningGraph
 
 from functools import lru_cache
 
+#import aimacode.search
 
 class AirCargoProblem(Problem):
     def __init__(self, cargos, planes, airports, initial: FluentState, goal: list):
@@ -127,6 +130,7 @@ class AirCargoProblem(Problem):
         :return: list of Action objects
         """
         possible_actions = []
+        self.node_expanded_count += 1
 
         kb = PropKB()
         kb.tell(decode_state(state, self.state_map).pos_sentence())
@@ -175,6 +179,7 @@ class AirCargoProblem(Problem):
         :param state: str representing state
         :return: bool
         """
+        self.goal_test_count += 1
         kb = PropKB()
         kb.tell(decode_state(state, self.state_map).pos_sentence())
         for clause in self.goal:
@@ -335,3 +340,36 @@ def air_cargo_p3() -> AirCargoProblem:
             expr('At(C4, SFO)'),
             ]
     return AirCargoProblem(cargos, planes, airports, init, goal)
+
+import time
+
+def compare_non_heuri(problem):
+    methods = [breadth_first_search, breadth_first_tree_search, depth_first_graph_search,
+               uniform_cost_search, depth_limited_search, iterative_deepening_search]
+
+    for method in methods:
+        start_time = time.time()
+        search_solution = method(problem)
+        path = search_solution.path()
+        count_action = 0
+        print("Search method name: {}".format(method.__name__))
+
+        print('\t', end='')
+        print(path)
+        print("\tNow print all actions:")
+        for node in path:
+            if node.action is not None:
+                count_action += 1
+                print('\t\t', end='')
+                print(node.action)
+
+        print("\t# of nodes expanded is: {}".format(problem.node_expanded_count))
+        print("\t# of goal tests is: {}".format(problem.goal_test_count))
+        print("\tElapsed time: {}s".format(time.time() - start_time))
+        print("\t# of actions in path is: {}, path length is {}".format(count_action, len(path)))
+        print('\n')
+        #break
+
+#compare_non_heuri(air_cargo_p1())
+compare_non_heuri(air_cargo_p2())
+#compare_non_heuri(air_cargo_p3())
