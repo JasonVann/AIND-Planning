@@ -28,8 +28,8 @@ class Problem:
         other arguments."""
         self.initial = initial
         self.goal = goal
-        self.node_expanded_count = 0  # To keep track of the # of nodes expanded during search
-        self.goal_test_count = 0
+        #self.node_expanded_count = 0  # To keep track of the # of nodes expanded during search
+        #self.goal_test_count = 0
 
     def actions(self, state):
         """Return the actions that can be executed in the given
@@ -241,7 +241,7 @@ def uniform_cost_search(problem):
     return best_first_graph_search(problem, lambda node: node.path_cost)
 
 
-def depth_limited_search(problem, limit=50):
+def depth_limited_search(problem, limit=4):
     "[Figure 3.17]"
     def recursive_dls(node, problem, limit):
         if problem.goal_test(node.state):

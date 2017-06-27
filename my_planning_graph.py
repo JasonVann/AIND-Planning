@@ -311,21 +311,6 @@ class PlanningGraph():
         #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
-        def old():
-            temp = set()
-            for action in self.all_actions:
-                #for state in self.s_levels[-1]:
-                    kb = PropKB()
-                    kb.tell(self.fs.pos_sentence())
-
-                    if action.check_precond(kb, action.args):
-                        action_node = PgNode_a(action)
-                        temp.add(action_node)
-                        for state in self.s_levels[level-1]:
-                            if state in action.precond_pos:
-                                state.children.add(action)
-                                action_node.parents.add(state)
-            self.a_levels.append(temp)
 
         temp = set()
         for action in self.all_actions:
@@ -356,7 +341,7 @@ class PlanningGraph():
         #   all of the new S nodes as children of all the A nodes that could produce them, and likewise add the A nodes to the
         #   parent sets of the S nodes
         temp = set()
-        pass
+
         for a_node in self.a_levels[level-1]:
             for s_node in a_node.effnodes:
                 s_node.parents.add(a_node)
@@ -560,7 +545,6 @@ class PlanningGraph():
                     break
 
                 for s_node in self.s_levels[i]:
-                    #print(560, i, s_node.symbol, goal)
                     #s_node.show()
                     if goal == s_node.symbol and s_node.is_pos:
                         # Assume the goal is always positive

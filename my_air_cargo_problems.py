@@ -13,8 +13,6 @@ from my_planning_graph import PlanningGraph
 
 from functools import lru_cache
 
-#import aimacode.search
-
 class AirCargoProblem(Problem):
     def __init__(self, cargos, planes, airports, initial: FluentState, goal: list):
         """
@@ -37,6 +35,9 @@ class AirCargoProblem(Problem):
         self.planes = planes
         self.airports = airports
         self.actions_list = self.get_actions()
+
+        self.node_expanded_count = 0  # To keep track of the # of nodes expanded during search
+        self.goal_test_count = 0
 
     def get_actions(self):
         """
@@ -69,7 +70,7 @@ class AirCargoProblem(Problem):
                     for airport in self.airports:
 
                         precond_pos = [expr("At({}, {})".format(cargo, airport)), expr("At({}, {})".format(plane, airport))]
-                        precond_neg = [expr("In({}, {})".format(cargo, plane))] # ??
+                        # precond_neg = [expr("In({}, {})".format(cargo, plane))] # Logically redundant
                         precond_neg = []
                         effect_add = [expr("In({}, {})".format(cargo, plane))]
                         effect_rem = [expr("At({}, {})".format(cargo, airport))]
@@ -89,7 +90,7 @@ class AirCargoProblem(Problem):
                     for airport in self.airports:
 
                         precond_pos = [expr("In({}, {})".format(cargo, plane)), expr("At({}, {})".format(plane, airport))]
-                        precond_neg = [expr("At({}, {})".format(cargo, airport))]
+                        # precond_neg = [expr("At({}, {})".format(cargo, airport))]
                         precond_neg = []
                         effect_add = [expr("At({}, {})".format(cargo, airport))]
                         effect_rem = [expr("In({}, {})".format(cargo, plane))]
@@ -341,21 +342,37 @@ def air_cargo_p3() -> AirCargoProblem:
             ]
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
-import time
 
-def compare_non_heuri(problem):
-    methods = [breadth_first_search, breadth_first_tree_search, depth_first_graph_search,
+def compare_non_heuri(p_idx = 1):
+    """An alternative to Run_search: Runs a comparison analysis on different non-heuristic search methods against 
+    different air cargo problems
+    More methods are compared for easier problems as time permits 
+    Input: 1 for air_cargo_p1
+    """
+    import time
+    problems = [air_cargo_p1(), air_cargo_p2(), air_cargo_p3()]
+    if p_idx == 1:
+        methods = [breadth_first_tree_search, breadth_first_search, depth_first_graph_search,
                uniform_cost_search, depth_limited_search, iterative_deepening_search]
 
+    elif p_idx == 2:
+        methods = [breadth_first_search, depth_first_graph_search,
+                   uniform_cost_search, depth_limited_search]
+        #methods = [iterative_deepening_search]
+
+    elif p_idx == 3:
+        methods = [breadth_first_search, depth_first_graph_search,
+                   uniform_cost_search]
+        #method = [breadth_first_search]
+
     for method in methods:
+        problem = eval('air_cargo_p{}()'.format(p_idx))
         start_time = time.time()
         search_solution = method(problem)
         path = search_solution.path()
         count_action = 0
         print("Search method name: {}".format(method.__name__))
 
-        print('\t', end='')
-        print(path)
         print("\tNow print all actions:")
         for node in path:
             if node.action is not None:
@@ -368,8 +385,5 @@ def compare_non_heuri(problem):
         print("\tElapsed time: {}s".format(time.time() - start_time))
         print("\t# of actions in path is: {}, path length is {}".format(count_action, len(path)))
         print('\n')
-        #break
 
-#compare_non_heuri(air_cargo_p1())
-compare_non_heuri(air_cargo_p2())
-#compare_non_heuri(air_cargo_p3())
+#compare_non_heuri(1)
